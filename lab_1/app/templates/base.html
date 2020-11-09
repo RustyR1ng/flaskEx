@@ -21,9 +21,9 @@
     </title>
 </head>
 
-<body>
+<body class="h-100">
 
-    <div class=" d-flex flex-column">
+    <div class=" d-flex flex-column h-100">
         <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
             <div class="container">
                 <a class="navbar-brand" href="{{ url_for('index') }}">Лабораторная работа № 1</a>
@@ -51,10 +51,11 @@
             <h1>Содержимое по умолчанию</h1>
             {% endblock %}
         </div>
+        <footer class="py-3 container-fluid d-flex justify-content-center align-items-center bg-dark text-white mt-auto">
+            <span>Лагутов Александр 191-352</span>
+        </footer>
     </div>
-    <footer class="py-3 container-fluid d-flex justify-content-center align-items-center bg-dark text-white">
-        <span>Лагутов Александр 191-352</span>
-    </footer>
+    
 
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
