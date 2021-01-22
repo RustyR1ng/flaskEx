@@ -3,6 +3,7 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, curren
 from flask_debugtoolbar import DebugToolbarExtension
 import os
 from mysql_db import MySQL
+import mysql.connector as connector
 
 
 login_man = LoginManager()
@@ -10,7 +11,7 @@ login_man = LoginManager()
 app = Flask(__name__)
 application = app
 app.secret_key = os.urandom(24)
-toolbar = DebugToolbarExtension(app)
+""" toolbar = DebugToolbarExtension(app) """
 app.config.from_pyfile('config.py')
 
 mysql = MySQL(app)
@@ -22,9 +23,9 @@ login_man.login_message_category = 'danger'
 
 
 class User(UserMixin):
-    def __init__(self, id, login):
+    def __init__(self, user_id, login):
         super().__init__()
-        self.id = id
+        self.id = user_id
         self.login = login
 
 
@@ -77,3 +78,51 @@ def logout():
 @login_required
 def secret():
     return render_template('secret.html')
+
+
+@app.route('/users')
+def users():
+    cursor = mysql.connection.cursor(named_tuple=True)
+    search_user = "SELECT * FROM lab_py_users;"
+    cursor.execute(search_user)
+    users = cursor.fetchall()
+    cursor.close()
+    return render_template('users/index.html', users=users)
+
+
+@app.route('/users/new')
+@login_required
+def new():
+    return render_template('users/new.html', user={})
+
+
+@app.route('/users/create', methods=['POST'])
+@login_required
+def create():
+    login = request.form.get('login') or None
+    password = request.form.get('password')
+    first_name = request.form.get('first_name')
+    last_name = request.form.get('last_name')
+    middle_name = request.form.get('middle_name')
+    query = '''
+    INSERT INTO lab_py_users (login, password_hash, first_name, last_name, middle_name)
+    VALUES (%s, SHA2(%s, 256), %s, %s, %s )
+    '''
+    cursor = mysql.connection.cursor(named_tuple=True)
+    try:
+        cursor.execute(query, (login, password,
+                               first_name, last_name, middle_name,))
+    except connector.errors.DatabaseError as err:
+        flash('Введены некорректные данные. Ошибка сохранения', 'danger')
+        user = {
+            'login': login,
+            'password': password,
+            'first_name': first_name,
+            'last_name': last_name,
+            'middle_name': middle_name
+        }
+        return render_template('users/new.html', user=user)
+    mysql.connection.commit()
+    cursor.close()
+    flash(f"User {login} created successful", 'success')
+    return redirect(url_for('users'))

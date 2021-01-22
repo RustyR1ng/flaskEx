@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1 class="my-5">Список юзеров</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>ФИО</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ user.last_name }} {{ user.first_name }} {{ user.middle_name or '' }}</td>
+            <td></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if current_user.is_authenticated %}
+<a class="btn btn-primary" href="{{ url_for('new') }}">Создать пользователя</a>
+{% endif %}
+{% endblock %}
