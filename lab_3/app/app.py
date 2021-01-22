@@ -1,5 +1,6 @@
 from flask import Flask, render_template, url_for, request, session, redirect, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
+from flask_debugtoolbar import DebugToolbarExtension
 import os
 
 
@@ -8,6 +9,8 @@ login_man = LoginManager()
 app = Flask(__name__)
 application = app
 app.secret_key = os.urandom(24)
+toolbar = DebugToolbarExtension(app)
+
 
 login_man.init_app(app)
 login_man.login_view = 'login'
